@@ -2,10 +2,10 @@
 /**
  * Functions  performed in hub
  *
- * @package distributor-{ Add-on slug }
+ * @package distributor-wc
  */
 
-namespace DT\NbAddon\{ Add - on namespace }\Hub;
+namespace DT\NbAddon\WC\Hub;
 
 /**
  * Setup actions

@@ -2,10 +2,10 @@
 /**
  * Functions  performed in spoke
  *
- * @package distributor-{ Add-on slug }
+ * @package distributor-wc
  */
 
-namespace DT\NbAddon\{ Add - on namespace }\Spoke;
+namespace DT\NbAddon\WC\Spoke;
 
 /**
  * Setup actions
