@@ -11,7 +11,6 @@ namespace DT\NbAddon\WC\Hub;
  * Setup actions
  */
 function setup() {
-	define( 'DISTRIBUTOR_DEBUG', true );
 	add_action(
 		'init',
 		function() {
