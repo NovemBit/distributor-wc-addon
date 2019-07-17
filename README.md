@@ -9,6 +9,7 @@ Currently it's handling product variations distribution.
 - PHP 5.6+
 - [WordPress](http://wordpress.org) 4.7+
 - [Distributor](https://github.com/NovemBit/distributor) plug-in
+- [Woocommerce](https://woocommerce.com)
 - You need to have all attributes that will be used for creating variations in both sides (`Source` and `Destinations`)
 
 ## Install
