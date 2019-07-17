@@ -32,4 +32,4 @@ function dt_wc_add_on_bootstrap() {
 	require_once plugin_dir_path( __FILE__ ) . 'manager.php';
 }
 
-add_action( 'plugins_loaded', 'dt_{ Add-on strictslug }_add_on_bootstrap' );
+add_action( 'plugins_loaded', 'dt_wc_add_on_bootstrap' );
