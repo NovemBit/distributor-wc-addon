@@ -14,8 +14,7 @@ function setup() {
 	add_action(
 		'init',
 		function () {
-			add_action( 'dt_process_distributor_attributes', __NAMESPACE__ . '\push', 10, 2 );
-			add_action( 'dt_process_subscription_attributes', __NAMESPACE__ . '\update', 10, 2 );
+			add_action( 'dt_process_distributor_attributes', __NAMESPACE__ . '\insert_variations', 10, 2 );
 		}
 	);
 }
@@ -23,21 +22,18 @@ function setup() {
 
 
 /**
- * Process inserted post, after initial push
+ * Insert variations on initial push
  *
  * @param WP_Post         $post    Inserted or updated post object.
  * @param WP_REST_Request $request Request object.
  */
-function push( $post, $request ) {
-	// .... logic
-}
-
-/**
- * Process updated post
- *
- * @param WP_Post         $post    Inserted or updated post object.
- * @param WP_REST_Request $request Request object.
- */
-function update( $post, $request ) {
-	// .... logic
+function insert_variations( $post, $request ) {
+	if ( function_exists( '\wc_get_product' ) && isset( $request['distributor_product_variations'] ) && ! empty( $request['distributor_product_variations'] ) ) {
+		$variations = $request['distributor_product_variations'];
+		$product    = wc_get_product( $post->ID );
+		foreach ( $variations as $variation_data ) {
+			$inserted_id = \DT\NbAddon\WC\Utils\create_variation( $variation_data, $product );
+			\DT\NbAddon\WC\Utils\set_variation_update( $variation_data, $post->ID, $inserted_id );
+		}
+	}
 }
