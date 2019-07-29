@@ -13,7 +13,11 @@ Currently it's handling product variations distribution.
 - You need to have all attributes that will be used for creating variations in both sides (`Source` and `Destinations`)
 
 ## Install
-Just install and activate it as simple WordPress plugin. You can get stable version from [here] or just clone repository's master branch.
+
+First you need to install [Distributor](https://github.com/10up/distributor) plugin.
+
+Once you have Distributor installed, [download the latest master build](https://github.com/NovemBit/distributor-wc-addon/archive/master.zip) and install on your website.
 
 ## Plugin Usage
-After you've installed and activated plugin, on every variation action (create | update | delete) it will perform those actions in all destiantions where parent post was pushed. So, you don't need to perform additional actions, just install, activate and enjoy
+
+After you've installed and activated plugin, on every variation action (create | update | delete) it will perform those actions in all destinations where parent post was pushed. So, you don't need to perform additional actions, just install, activate and enjoy
