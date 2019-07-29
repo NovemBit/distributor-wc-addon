@@ -57,7 +57,33 @@ function push_variations( $post_body, $post ) {
 function variation_update( $variation_id ) {
 	$variation      = wc_get_product( $variation_id );
 	$parent_post_id = $variation->get_parent_id();
-	$result         = process_variation_update( $parent_post_id, $variation_id );
+	$allowed        = apply_filters( 'dt_action_processing_allowed', true, $parent_post_id, $variation_id );
+
+	if ( $allowed && ! wp_doing_cron() ) {
+		/**
+		 * Add possibility to send variation updates in background
+		 *
+		 * @param bool      true            Whether to run variation update.
+		 * @param array     $parent_post_id Parent post ID.
+		 * @param string    $variation_id Updated variation ID.
+		 */
+		$allow_wc_variations_update = apply_filters( 'dt_allow_wc_variations_update', true, $parent_post_id, $variation_id );
+		if ( false === $allow_wc_variations_update ) {
+			wp_send_json_success(
+				array(
+					'results' => 'Scheduled a task.',
+				)
+			);
+
+			exit;
+		}
+	}
+
+	if ( $allowed ) {
+		$result = process_variation_update( $parent_post_id, $variation_id );
+	}
+	wp_send_json( apply_filters( 'dt_manage_wc_variations_response_hub', $result ) );
+	exit;
 }
 
 /**
@@ -104,9 +130,9 @@ function process_variation_update( $post_id, $var ) {
 			$response_code = wp_remote_retrieve_response_code( $request );
 			$headers       = wp_remote_retrieve_headers( $request );
 
-			$result[ $post_id ][ $variation_id ] = json_decode( wp_remote_retrieve_body( $request ) );
+			$result[ $post_id ][ $subscription_id ] = json_decode( wp_remote_retrieve_body( $request ) );
 		} else {
-			$result[ $post_id ][ $variation_id ] = $request;
+			$result[ $post_id ][ $subscription_id ] = $request;
 		}
 	}
 	return $result;
