@@ -11,7 +11,7 @@ functionality to handle intricacies of product distribution.
 
 ## Install
 
-At this moment, Distributor WooCommerce add-on is not yet compatible with the original [Distributor](https://github.com/10up/distributor), therefore, please use our [Distributor fork](https://github.com/NovemBit/distributor).
+First you need to install [Distributor](https://github.com/10up/distributor) plugin.
 
 Once you have Distributor installed, [download the latest master build](https://github.com/NovemBit/distributor-wc-addon/archive/master.zip) and install on your website.
 
