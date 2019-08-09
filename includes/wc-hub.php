@@ -44,8 +44,10 @@ function push_variations( $post_id, $remote_post_id, $signature, $target_url ) {
 						 * Add possibility to send variation insert in background
 						 *
 						 * @param bool      true            Whether to run variation update.
-						 * @param array     $parent_post_id Parent post ID.
-						 * @param string    $variation_id Updated variation ID.
+						 * @param int    $post_id Pushed post ID.
+						 * @param int    $remote_post_id Remote post ID.
+						 * @param string $signature Generated signature for subscription.
+						 * @param string $target_url Target url to push to.
 						 */
 					$allow_wc_variation_insert = apply_filters( 'dt_allow_wc_variations_insert', true, $post_id, $remote_post_id, $signature, $target_url );
 					if ( false === $allow_wc_variation_insert ) {
