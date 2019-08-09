@@ -23,6 +23,37 @@ function setup() {
 function register_rest_routes() {
 	register_rest_route(
 		'wp/v2',
+		'/distributor/wc/variations/insert',
+		[
+			'methods'             => 'POST',
+			'args'                => [
+				'post_id'        => [
+					'required'          => true,
+					'validate_callback' => function( $param, $request, $key ) {
+						return is_numeric( $param );
+					},
+				],
+				'signature'      => [
+					'required'          => true,
+					'validate_callback' => function( $param, $request, $key ) {
+						return is_string( $param );
+					},
+				],
+				'variation_data' => [
+					'required'          => true,
+					'validate_callback' => function( $param, $request, $key ) {
+						return is_array( $param );
+					},
+				],
+			],
+			'callback'            => __NAMESPACE__ . '\insert_variations',
+			'permission_callback' => function () {
+				return true;
+			},
+		]
+	);
+	register_rest_route(
+		'wp/v2',
 		'/distributor/wc/variations/receive',
 		[
 			'methods'             => 'POST',
@@ -77,6 +108,28 @@ function register_rest_routes() {
 			},
 		]
 	);
+}
+
+
+/**
+ * Insert variations on initial push
+ *
+ * @param \WP_REST_Request $request WP_REST_Request instance.
+ */
+function insert_variations( \WP_REST_Request $request ) {
+	$post_id          = $request->get_param( 'post_id' );
+	$signature        = $request->get_param( 'signature' );
+	$variation_data   = $request->get_param( 'variation_data' );
+	$is_valid_request = \DT\NbAddon\WC\Utils\validate_request( $post_id, $signature );
+	if ( true !== $is_valid_request ) {
+		return $is_valid_request;
+	}
+	$product = wc_get_product( $post_id );
+	foreach ( $variation_data as $variation ) {
+		$inserted_id = \DT\NbAddon\WC\Utils\create_variation( $variation, $product );
+		\DT\NbAddon\WC\Utils\set_variation_update( $variation, $post_id, $inserted_id );
+	}
+
 }
 
 /**
