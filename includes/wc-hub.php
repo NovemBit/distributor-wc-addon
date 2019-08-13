@@ -94,8 +94,8 @@ function push_variations( $post_id, $remote_post_id, $signature, $target_url ) {
 function variation_update( $variation_id ) {
 	$variation      = wc_get_product( $variation_id );
 	$parent_post_id = $variation->get_parent_id();
-	$subscriptions = get_post_meta( $parent_post_id, 'dt_subscriptions', true );
-	if ( empty( $subscriptions ) ) {
+	$connection_map = get_post_meta( $parent_post_id, 'dt_connection_map', true );
+	if ( empty( $connection_map ) ) {
 		return;
 	}
 		/**
