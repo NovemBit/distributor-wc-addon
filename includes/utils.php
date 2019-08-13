@@ -31,6 +31,22 @@ function prepare_bulk_variations_update( $variations ) {
 function prepare_variation_update( $variation_id ) {
 	$variation = wc_get_product( $variation_id );
 	$image_id  = $variation->get_image_id();
+	
+	add_filter('dt_blacklisted_meta', function($blacklist){
+		$meta_to_skip = [
+			'_sku',
+			'_manage_stock',
+			'_backorders',
+			'_weight',
+			'_length',
+			'_width',
+			'_height',
+			'_tax_class',
+			'_purchase_note',
+			'_stock_status',
+		];
+		return array_merge($blacklist, $meta_to_skip);
+	});
 	return [
 		'original_id'        => $variation->get_id(),
 		'data'               => [
