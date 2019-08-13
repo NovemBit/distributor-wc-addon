@@ -94,7 +94,10 @@ function push_variations( $post_id, $remote_post_id, $signature, $target_url ) {
 function variation_update( $variation_id ) {
 	$variation      = wc_get_product( $variation_id );
 	$parent_post_id = $variation->get_parent_id();
-
+	$subscriptions = get_post_meta( $parent_post_id, 'dt_subscriptions', true );
+	if ( empty( $subscriptions ) ) {
+		return;
+	}
 		/**
 		 * Add possibility to send variation updates in background
 		 *
@@ -104,13 +107,7 @@ function variation_update( $variation_id ) {
 		 */
 		$allow_wc_variations_update = apply_filters( 'dt_allow_wc_variations_update', true, $parent_post_id, $variation_id );
 	if ( false === $allow_wc_variations_update ) {
-		wp_send_json_success(
-			array(
-				'results' => 'Scheduled a task.',
-			)
-		);
-
-		exit;
+		return;
 	}
 	$result = process_variation_update( $parent_post_id, $variation_id );
 	wp_send_json( apply_filters( 'dt_manage_wc_variations_response_hub', $result ) );
