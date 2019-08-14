@@ -133,7 +133,7 @@ function insert_variations( \WP_REST_Request $request ) {
 	 * 
 	 * @param int $post_id Parent post ID.
 	 */
-	do_action('dt_variations_initial_insert', $post_id);
+	do_action('dt_variations_initial_inserted', $post_id);
 		return $res;
 	}
 
@@ -166,7 +166,7 @@ function receive_variations( \WP_REST_Request $request ) {
 	 * 
 	 * @param int $post_id Parent post ID.
 	 */
-	do_action('dt_variation_deleted' ,$post_id);
+	do_action('dt_variations_updated' ,$post_id);
 	return $res;
 }
 
