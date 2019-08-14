@@ -127,7 +127,9 @@ function insert_variations( \WP_REST_Request $request ) {
 	$product = wc_get_product( $post_id );
 	foreach ( $variation_data as $variation ) {
 		$inserted_id = \DT\NbAddon\WC\Utils\create_variation( $variation, $product );
-		\DT\NbAddon\WC\Utils\set_variation_update( $variation, $post_id, $inserted_id );
+		$res         = \DT\NbAddon\WC\Utils\set_variation_update( $variation, $post_id, $inserted_id );
+		update_advanced_pricing( $parent_id );
+		return $res;
 	}
 
 }
@@ -149,11 +151,13 @@ function receive_variations( \WP_REST_Request $request ) {
 
 	if ( \DT\NbAddon\WC\Utils\is_assoc( $variation_data ) ) {
 		\DT\NbAddon\WC\Utils\sync_variations( $post_id, $variation_data['current_variations'] );
-		return \DT\NbAddon\WC\Utils\set_variation_update( $variation_data, $post_id );
+		$res = \DT\NbAddon\WC\Utils\set_variation_update( $variation_data, $post_id );
 	} else {
 		\DT\NbAddon\WC\Utils\sync_variations( $post_id, $variation_data[0]['current_variations'] );
-		return \DT\NbAddon\WC\Utils\set_variations_update( $variation_data, $post_id );
+		$res = \DT\NbAddon\WC\Utils\set_variations_update( $variation_data, $post_id );
 	}
+	update_advanced_pricing( $parent_id );
+	return $res;
 }
 
 
@@ -170,11 +174,35 @@ function delete_variations( \WP_REST_Request $request ) {
 	if ( empty( $variation_id ) ) {
 		return new \WP_Error( 'rest_post_invalid_id', esc_html__( 'Invalid variation ID.', 'distributor-wc' ), array( 'status' => 404 ) );
 	}
-	$variation = wc_get_product( $variation_id );
-
-	$is_valid_request = \DT\NbAddon\WC\Utils\validate_request( $variation->get_parent_id(), $signature );
+	$variation        = wc_get_product( $variation_id );
+	$parent_id        = $variation->get_parent_id();
+	$is_valid_request = \DT\NbAddon\WC\Utils\validate_request( $parent_id, $signature );
 	if ( true !== $is_valid_request ) {
 		return $is_valid_request;
 	}
 	$variation->delete( true );
+	update_advanced_pricing( $parent_id );
+}
+
+
+/**
+ * Update advanced pricing meta, TODO: MV to brandlight integration
+ *
+ * @param int $post_id    Post ID.
+ */
+function update_advanced_pricing( $post_id ) {
+	/* _advanced_pricing can contain variation ID */
+	$advanced_pricing = (array) get_post_meta( $post_id, '_advanced_pricing', true );
+	foreach ( $advanced_pricing as &$pricing ) {
+		if ( isset( $pricing['condition']['variation'] ) ) {
+			global $wpdb;
+			$source_id = $pricing['condition']['variation'];
+			$mapped_id = $wpdb->get_var( "SELECT post.ID FROM $wpdb->posts AS post INNER JOIN $wpdb->postmeta AS meta ON post.ID = meta.post_id WHERE post.post_status != 'trash'  AND meta.meta_key = 'dt_original_variation_id' AND meta.meta_value ='$source_id'" ); //phpcs:ignore
+			if ( $mapped_id ) {
+				$pricing['condition']['variation'] = $mapped_id;
+			}
+		}
+	}
+		update_post_meta( $post_id, '_advanced_pricing', $advanced_pricing );
+
 }
