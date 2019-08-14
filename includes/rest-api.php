@@ -128,7 +128,7 @@ function insert_variations( \WP_REST_Request $request ) {
 	foreach ( $variation_data as $variation ) {
 		$inserted_id = \DT\NbAddon\WC\Utils\create_variation( $variation, $product );
 		$res         = \DT\NbAddon\WC\Utils\set_variation_update( $variation, $post_id, $inserted_id );
-		update_advanced_pricing( $parent_id );
+		update_advanced_pricing( $post_id );
 		return $res;
 	}
 
@@ -156,7 +156,7 @@ function receive_variations( \WP_REST_Request $request ) {
 		\DT\NbAddon\WC\Utils\sync_variations( $post_id, $variation_data[0]['current_variations'] );
 		$res = \DT\NbAddon\WC\Utils\set_variations_update( $variation_data, $post_id );
 	}
-	update_advanced_pricing( $parent_id );
+	update_advanced_pricing( $post_id );
 	return $res;
 }
 
