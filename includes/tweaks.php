@@ -5,7 +5,7 @@
  * @package distributor-wc-addon
  */
 
-namespace DT\NbAddon\Comments\Tweaks;
+namespace DT\NbAddon\WC\Tweaks;
 
 /**
  * Setup actions

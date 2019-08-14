@@ -67,7 +67,7 @@ function push_variations( $post_id, $remote_post_id, $signature, $target_url ) {
 							 * Filter the arguments sent to the remote server during a variations insert.
 							 *
 							 * @param  array  $post_body The request body to send.
-							 * @param  int $post      Parent post id of comments that is being pushed.
+							 * @param  int $post      Parent post id of variations that is being pushed.
 							 */
 							'body'    => apply_filters( 'dt_wc_variations_push_args', $post_body, $post_id ),
 						]
