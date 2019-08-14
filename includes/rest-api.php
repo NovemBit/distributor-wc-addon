@@ -128,7 +128,12 @@ function insert_variations( \WP_REST_Request $request ) {
 	foreach ( $variation_data as $variation ) {
 		$inserted_id = \DT\NbAddon\WC\Utils\create_variation( $variation, $product );
 		$res         = \DT\NbAddon\WC\Utils\set_variation_update( $variation, $post_id, $inserted_id );
-		update_advanced_pricing( $post_id );
+				/**
+	 * Action triggered after variations initial insert in spoke
+	 * 
+	 * @param int $post_id Parent post ID.
+	 */
+	do_action('dt_variations_initial_insert', $post_id);
 		return $res;
 	}
 
@@ -156,7 +161,12 @@ function receive_variations( \WP_REST_Request $request ) {
 		\DT\NbAddon\WC\Utils\sync_variations( $post_id, $variation_data[0]['current_variations'] );
 		$res = \DT\NbAddon\WC\Utils\set_variations_update( $variation_data, $post_id );
 	}
-	update_advanced_pricing( $post_id );
+		/**
+	 * Action triggered after variations update in spoke
+	 * 
+	 * @param int $post_id Parent post ID.
+	 */
+	do_action('dt_variation_deleted' ,$post_id);
 	return $res;
 }
 
@@ -181,28 +191,12 @@ function delete_variations( \WP_REST_Request $request ) {
 		return $is_valid_request;
 	}
 	$variation->delete( true );
-	update_advanced_pricing( $parent_id );
+	/**
+	 * Action triggered after variation deleted in spoke
+	 * 
+	 * @param int $parent_id Parent post ID.
+	 */
+	do_action('dt_variation_deleted',$parent_id);
 }
 
 
-/**
- * Update advanced pricing meta, TODO: MV to brandlight integration
- *
- * @param int $post_id    Post ID.
- */
-function update_advanced_pricing( $post_id ) {
-	/* _advanced_pricing can contain variation ID */
-	$advanced_pricing = (array) get_post_meta( $post_id, '_advanced_pricing', true );
-	foreach ( $advanced_pricing as &$pricing ) {
-		if ( isset( $pricing['condition']['variation'] ) ) {
-			global $wpdb;
-			$source_id = $pricing['condition']['variation'];
-			$mapped_id = $wpdb->get_var( "SELECT post.ID FROM $wpdb->posts AS post INNER JOIN $wpdb->postmeta AS meta ON post.ID = meta.post_id WHERE post.post_status != 'trash'  AND meta.meta_key = 'dt_original_variation_id' AND meta.meta_value ='$source_id'" ); //phpcs:ignore
-			if ( $mapped_id ) {
-				$pricing['condition']['variation'] = $mapped_id;
-			}
-		}
-	}
-		update_post_meta( $post_id, '_advanced_pricing', $advanced_pricing );
-
-}
