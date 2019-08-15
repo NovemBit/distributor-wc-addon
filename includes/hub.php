@@ -40,6 +40,7 @@ function push_variations( $post_id, $remote_post_id, $signature, $target_url ) {
 				$variations = $_product->get_children();
 
 				if ( ! empty( $variations ) ) {
+					if ( ! wp_doing_cron() ) { //phpcs:ignore
 						/**
 						 * Add possibility to send variation insert in background
 						 *
@@ -53,6 +54,7 @@ function push_variations( $post_id, $remote_post_id, $signature, $target_url ) {
 					if ( false === $allow_wc_variation_insert ) {
 						return;
 					}
+				}
 					$variation_data = \DT\NbAddon\WC\Utils\prepare_bulk_variations_update( $variations );
 					$post_body      = [
 						'post_id'        => $remote_post_id,
@@ -98,6 +100,7 @@ function variation_update( $variation_id ) {
 	if ( empty( $connection_map ) ) {
 		return;
 	}
+	if ( ! wp_doing_cron() ) { //phpcs:ignore
 		/**
 		 * Add possibility to send variation updates in background
 		 *
@@ -109,6 +112,7 @@ function variation_update( $variation_id ) {
 	if ( false === $allow_wc_variations_update ) {
 		return;
 	}
+}
 	$result = process_variation_update( $parent_post_id, $variation_id );
 	wp_send_json( apply_filters( 'dt_manage_wc_variations_response_hub', $result ) );
 	exit;
