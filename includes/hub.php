@@ -28,10 +28,11 @@ function setup() {
  * @param int    $remote_post_id Remote post ID.
  * @param string $signature Generated signature for subscription.
  * @param string $target_url Target url to push to.
+ * @param bool   $allow_in_bg Allow apply filter to run function in background (for preventing infinite loop)
  *
- * @return array
+ * @return array|void
  */
-function push_variations( $post_id, $remote_post_id, $signature, $target_url ) {
+function push_variations( $post_id, $remote_post_id, $signature, $target_url, $allow_in_bg = true ) {
 	$post = get_post( $post_id );
 	if ( 'product' === $post->post_type && function_exists( 'wc_get_product' ) ) {
 		$_product = wc_get_product( $post->ID );
@@ -40,7 +41,7 @@ function push_variations( $post_id, $remote_post_id, $signature, $target_url ) {
 				$variations = $_product->get_children();
 
 				if ( ! empty( $variations ) ) {
-					if ( ! wp_doing_cron() ) { //phpcs:ignore
+					if ( $allow_in_bg ) {
 						/**
 						 * Add possibility to send variation insert in background
 						 *
@@ -50,11 +51,11 @@ function push_variations( $post_id, $remote_post_id, $signature, $target_url ) {
 						 * @param string $signature Generated signature for subscription.
 						 * @param string $target_url Target url to push to.
 						 */
-					$allow_wc_variation_insert = apply_filters( 'dt_allow_wc_variations_insert', true, $post_id, $remote_post_id, $signature, $target_url );
-					if ( false === $allow_wc_variation_insert ) {
-						return;
+						$allow_wc_variation_insert = apply_filters( 'dt_allow_wc_variations_insert', true, $post_id, $remote_post_id, $signature, $target_url );
+						if ( false === $allow_wc_variation_insert ) {
+							return;
+						}
 					}
-				}
 					$variation_data = \DT\NbAddon\WC\Utils\prepare_bulk_variations_update( $variations );
 					$post_body      = [
 						'post_id'        => $remote_post_id,
