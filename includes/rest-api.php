@@ -115,6 +115,8 @@ function register_rest_routes() {
  * Insert variations on initial push
  *
  * @param \WP_REST_Request $request WP_REST_Request instance.
+ *
+ * @return array
  */
 function insert_variations( \WP_REST_Request $request ) {
 	$post_id          = $request->get_param( 'post_id' );
@@ -124,19 +126,19 @@ function insert_variations( \WP_REST_Request $request ) {
 	if ( true !== $is_valid_request ) {
 		return $is_valid_request;
 	}
+	$res = [];
 	$product = wc_get_product( $post_id );
 	foreach ( $variation_data as $variation ) {
 		$inserted_id = \DT\NbAddon\WC\Utils\create_variation( $variation, $product );
-		$res         = \DT\NbAddon\WC\Utils\set_variation_update( $variation, $post_id, $inserted_id );
-				/**
-	 * Action triggered after variations initial insert in spoke
-	 * 
-	 * @param int $post_id Parent post ID.
-	 */
-	do_action('dt_variations_inserted', $post_id);
-		return $res;
+		$res[]       = \DT\NbAddon\WC\Utils\set_variation_update( $variation, $post_id, $inserted_id );
+		/**
+		 * Action triggered after variations initial insert in spoke
+		 *
+		 * @param int $post_id Parent post ID.
+		 */
+		do_action('dt_variations_inserted', $post_id);
 	}
-
+	return $res;
 }
 
 /**
