@@ -131,13 +131,13 @@ function insert_variations( \WP_REST_Request $request ) {
 	foreach ( $variation_data as $variation ) {
 		$inserted_id = \DT\NbAddon\WC\Utils\create_variation( $variation, $product );
 		$res[]       = \DT\NbAddon\WC\Utils\set_variation_update( $variation, $post_id, $inserted_id );
-		/**
-		 * Action triggered after variations initial insert in spoke
-		 *
-		 * @param int $post_id Parent post ID.
-		 */
-		do_action('dt_variations_inserted', $post_id);
 	}
+	/**
+	 * Action triggered after variations initial insert in spoke
+	 *
+	 * @param int $post_id Parent post ID.
+	 */
+	do_action('dt_variations_inserted', $post_id);
 	return $res;
 }
 
