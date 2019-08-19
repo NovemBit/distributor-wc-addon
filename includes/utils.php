@@ -69,6 +69,9 @@ function prepare_variation_update( $variation_id ) {
 			'shipping_class_id' => $variation->get_shipping_class_id(),
 			'purchase_note'     => $variation->get_purchase_note(),
 			'status'            => $variation->variation_is_active(),
+			'price'	            => $variation->get_price(),
+			'regular_price'     => $variation->get_regular_price(),
+			'sale_price'        => $variation->get_sale_price(),
 		],
 		'current_variations' => wc_get_product( $variation->get_parent_id() )->get_children(),
 		'meta'               => \Distributor\Utils\prepare_meta( $variation->get_id() ),
@@ -122,6 +125,9 @@ function set_variation_update( $variation_data, $post_id, $variation_id = null )
 		$variation->set_height( $update['height'] );
 		$variation->set_tax_class( $update['tax_class'] );
 		$variation->set_shipping_class_id( $update['shipping_class_id'] );
+		$variation->set_regular_price( $update['regular_price'] );
+		$variation->set_sale_price( $update['sale_price'] );
+		$variation->set_price( $update['price'] );
 		$current_image_id = $variation->get_image_id();
 		if ( ! empty( $update['image']['url'] ) ) {
 			$original_media_id = $update['image']['id'];
