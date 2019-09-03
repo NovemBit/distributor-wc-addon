@@ -105,9 +105,9 @@ function variation_update( $variation_id ) {
 		/**
 		 * Add possibility to send variation updates in background
 		 *
-		 * @param bool      true            Whether to run variation update.
-		 * @param array     $parent_post_id Parent post ID.
-		 * @param string    $variation_id Updated variation ID.
+		 * @param bool      true            Whether to run variation update or not.
+		 * @param int       $parent_post_id Parent post ID.
+		 * @param int       $variation_id   Updated variation ID.
 		 */
 		$allow_wc_variations_update = apply_filters( 'dt_allow_wc_variations_update', true, $parent_post_id, $variation_id );
 	if ( false === $allow_wc_variations_update ) {
@@ -124,6 +124,8 @@ function variation_update( $variation_id ) {
  *
  * @param int       $post_id Parent post ID.
  * @param int|array $var Variation id or array containing all updated variations ids.
+ *
+ * @return array
  */
 function process_variation_update( $post_id, $var ) {
 	$update        = is_array( $var ) ? \DT\NbAddon\WC\Utils\prepare_bulk_variations_update( $var ) : \DT\NbAddon\WC\Utils\prepare_variation_update( $var );
