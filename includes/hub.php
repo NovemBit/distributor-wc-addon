@@ -110,10 +110,10 @@ function variation_update( $variation_id ) {
 		 * @param int       $variation_id   Updated variation ID.
 		 */
 		$allow_wc_variations_update = apply_filters( 'dt_allow_wc_variations_update', true, $parent_post_id, $variation_id );
-	if ( false === $allow_wc_variations_update ) {
-		return;
+		if ( false === $allow_wc_variations_update ) {
+			return;
+		}
 	}
-}
 	$result = process_variation_update( $parent_post_id, $variation_id );
 	wp_send_json( apply_filters( 'dt_manage_wc_variations_response_hub', $result ) );
 	exit;

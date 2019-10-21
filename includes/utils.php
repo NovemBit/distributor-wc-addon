@@ -34,22 +34,16 @@ function prepare_variation_update( $variation_id ) {
 
 	add_filter(
 		'dt_blacklisted_meta',
-		function( $blacklist ) {
-			$meta_to_skip = [
-				'_sku',
-				'_manage_stock',
-				'_backorders',
-				'_weight',
-				'_length',
-				'_width',
-				'_height',
-				'_tax_class',
-				'_purchase_note',
-				'_stock_status',
-			];
-			return array_merge( $blacklist, $meta_to_skip );
-		}
+		__NAMESPACE__ . '\change_variation_blacklisted_meta'
 	);
+
+	$meta = \Distributor\Utils\prepare_meta( $variation->get_id() );
+
+	remove_filter(
+		'dt_blacklisted_meta',
+		__NAMESPACE__ . '\change_variation_blacklisted_meta'
+	);
+
 	return [
 		'original_id'        => $variation->get_id(),
 		'data'               => [
@@ -74,8 +68,31 @@ function prepare_variation_update( $variation_id ) {
 			'sale_price'        => $variation->get_sale_price(),
 		],
 		'current_variations' => wc_get_product( $variation->get_parent_id() )->get_children(),
-		'meta'               => \Distributor\Utils\prepare_meta( $variation->get_id() ),
+		'meta'               => $meta,
 	];
+}
+
+/**
+ * Change default blacklisted meta for product variation
+ *
+ * @param array $blacklist
+ *
+ * @return array
+ */
+function change_variation_blacklisted_meta( $blacklist ) {
+	$meta_to_skip = [
+		'_sku',
+		'_manage_stock',
+		'_backorders',
+		'_weight',
+		'_length',
+		'_width',
+		'_height',
+		'_tax_class',
+		'_purchase_note',
+		'_stock_status',
+	];
+	return array_merge( $blacklist, $meta_to_skip );
 }
 
 /**
