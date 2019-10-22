@@ -127,7 +127,7 @@ function set_variation_update( $variation_data, $post_id, $variation_id = null )
 	if ( ! empty( $variation_id ) ) {
 		$variation = wc_get_product( $variation_id );
 
-		if ( ! empty( $update['sku'] ) && wc_product_has_unique_sku( $variation_id, $update['sku'] ) ) {
+		if ( ! empty( $update['sku'] ) ) {
 			$variation->set_sku( $update['sku'] );
 		}
 
