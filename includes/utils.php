@@ -29,8 +29,11 @@ function prepare_bulk_variations_update( $variations ) {
  * @return array Prepared and formatted variation update array.
  */
 function prepare_variation_update( $variation_id ) {
-	$variation = wc_get_product( $variation_id );
-	$image_id  = $variation->get_image_id();
+	$variation    = wc_get_product( $variation_id );
+	$parent       = $variation->get_parent_data();
+	$var_image_id = $variation->get_image_id();
+	// Do not distribute the image, if it does not belong to variation
+	$image_id = $var_image_id === $parent['image_id'] ? '' : $var_image_id;
 
 	add_filter(
 		'dt_blacklisted_meta',
@@ -49,8 +52,8 @@ function prepare_variation_update( $variation_id ) {
 		'data'               => [
 			'sku'               => $variation->get_sku(),
 			'image'             => [
-				'id'  => $image_id,
-				'url' => empty( $image_id ) ? '' : wp_get_attachment_url( $image_id ),
+				'id'         => $image_id,
+				'source_url' => empty( $image_id ) ? '' : wp_get_attachment_url( $image_id ),
 			],
 			'manage_stock'      => $variation->get_manage_stock(),
 			'backorders'        => $variation->get_backorders(),
@@ -63,7 +66,7 @@ function prepare_variation_update( $variation_id ) {
 			'shipping_class_id' => $variation->get_shipping_class_id(),
 			'purchase_note'     => $variation->get_purchase_note(),
 			'status'            => $variation->variation_is_active(),
-			'price'	            => $variation->get_price(),
+			'price'             => $variation->get_price(),
 			'regular_price'     => $variation->get_regular_price(),
 			'sale_price'        => $variation->get_sale_price(),
 		],
@@ -75,7 +78,7 @@ function prepare_variation_update( $variation_id ) {
 /**
  * Change default blacklisted meta for product variation
  *
- * @param array $blacklist
+ * @param array $blacklist Blacklisted meta array
  *
  * @return array
  */
@@ -145,21 +148,7 @@ function set_variation_update( $variation_data, $post_id, $variation_id = null )
 		$variation->set_regular_price( $update['regular_price'] );
 		$variation->set_sale_price( $update['sale_price'] );
 		$variation->set_price( $update['price'] );
-		$current_image_id = $variation->get_image_id();
-		if ( ! empty( $update['image']['url'] ) ) {
-			$original_media_id = $update['image']['id'];
-			$existing_image_id = get_existing_media( $variation_id, $original_media_id );
-			if ( empty( $existing_image_id ) ) {
-				$new_image_id = \Distributor\Utils\process_media( $update['image']['url'], $variation_id );
-				wp_update_attachment_metadata( $new_image_id, wp_generate_attachment_metadata( $new_image_id, get_attached_file( $new_image_id ) ) );
-				$variation->set_image_id( $new_image_id );
-				update_post_meta( $new_image_id, 'dt_original_media_id', $original_media_id );
-			} else {
-				$variation->set_image_id( $existing_image_id );
-			}
-		} else {
-			$variation->set_image_id( '' );
-		}
+		\Distributor\Utils\set_media( $variation_id, empty( $update['image']['source_url'] ) ? [] : [ $update['image'] ] );
 		$variation->save();
 		$status = $update['status'] ? 'publish' : 'private';
 		wp_update_post(
