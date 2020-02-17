@@ -17,6 +17,7 @@ function setup() {
 			add_action( 'dt_post_subscription_created', __NAMESPACE__ . '\push_variations', 10, 4 );
 			add_action( 'delete_post', __NAMESPACE__ . '\on_variation_delete', 10, 1 );
 			add_action( 'woocommerce_update_product_variation', __NAMESPACE__ . '\variation_update', 10, 2 );
+			add_action( 'updated_post_meta', __NAMESPACE__ . '\updated_post_meta', 10, 4 );
 		}
 	);
 }
@@ -223,5 +224,21 @@ function on_variation_delete( $post_id ) {
 				$result[ $subscription_id ] = $request;
 			}
 		}
+	}
+}
+
+/**
+ * Trigger notification when post meta updated
+ *
+ * @param int $meta_id
+ * @param int $post_id
+ * @param string $meta_key
+ * @param string $meta_value
+ *
+ * @return array|false|void|\WP_Error
+ */
+function updated_post_meta($meta_id, $post_id, $meta_key, $meta_value) {
+	if ( function_exists( '\Distributor\Subscriptions\send_notifications' ) ) {
+		return \Distributor\Subscriptions\send_notifications( $post_id );
 	}
 }
