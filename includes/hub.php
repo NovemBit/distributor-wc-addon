@@ -98,9 +98,11 @@ function variation_update( $variation_id ) {
 	$variation      = wc_get_product( $variation_id );
 	$parent_post_id = $variation->get_parent_id();
 	$connection_map = get_post_meta( $parent_post_id, 'dt_connection_map', true );
+
 	if ( empty( $connection_map ) ) {
 		return;
 	}
+
 	if ( ! wp_doing_cron() ) { //phpcs:ignore
 		/**
 		 * Add possibility to send variation updates in background
@@ -114,9 +116,9 @@ function variation_update( $variation_id ) {
 			return;
 		}
 	}
-	$result = process_variation_update( $parent_post_id, $variation_id );
-	wp_send_json( apply_filters( 'dt_manage_wc_variations_response_hub', $result ) );
-	exit;
+
+	process_variation_update( $parent_post_id, $variation_id );
+	return;
 }
 
 /**
