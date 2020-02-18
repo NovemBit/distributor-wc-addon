@@ -238,13 +238,13 @@ function on_variation_delete( $post_id ) {
  * @return array|false|void|\WP_Error
  */
 function updated_post_meta( $meta_id, $post_id, $meta_key, $meta_value ) {
-	$distributed_product_id = wp_cache_get( 'distributed_product_id' );
+	static $distributed_product_ids = array();
 
-	if ( $distributed_product_id && $distributed_product_id == $post_id ) {
+	if ( in_array( $post_id, $distributed_product_ids ) ) {
 		return;
-	} else {
-		wp_cache_set( 'distributed_product_id', $post_id );
 	}
+
+	$distributed_product_ids[] = $post_id;
 
 	if ( function_exists( '\Distributor\Subscriptions\send_notifications' ) ) {
 		return \Distributor\Subscriptions\send_notifications( $post_id );
