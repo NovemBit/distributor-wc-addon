@@ -120,11 +120,12 @@ function set_variation_update( $variation_data, $post_id, $variation_id = null )
 	$original_id = $variation_data['original_id'];
 	$update      = $variation_data['data'];
 	$meta        = $variation_data['meta'];
-	\Distributor\Utils\set_meta( $variation_id, $meta );
+
 	if ( empty( $variation_id ) ) {
 		$variation_id = get_variation_by_original_id( $original_id );
 	}
 	if ( ! empty( $variation_id ) ) {
+		\Distributor\Utils\set_meta( $variation_id, $meta );
 		$variation = wc_get_product( $variation_id );
 
 		if ( ! empty( $update['sku'] ) ) {
