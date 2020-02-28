@@ -116,7 +116,7 @@ function register_rest_routes() {
  *
  * @param \WP_REST_Request $request WP_REST_Request instance.
  *
- * @return array
+ * @return array|bool
  */
 function insert_variations( \WP_REST_Request $request ) {
 	$post_id          = $request->get_param( 'post_id' );
@@ -126,8 +126,11 @@ function insert_variations( \WP_REST_Request $request ) {
 	if ( true !== $is_valid_request ) {
 		return $is_valid_request;
 	}
-	$res = [];
-	$product = wc_get_product( $post_id );
+
+	$variation_data = \DT\NbAddon\WC\Utils\decode( $variation_data );
+	$res            = [];
+	$product        = wc_get_product( $post_id );
+
 	foreach ( $variation_data as $variation ) {
 		$inserted_id = \DT\NbAddon\WC\Utils\create_variation( $variation, $product );
 		$res[]       = \DT\NbAddon\WC\Utils\set_variation_update( $variation, $post_id, $inserted_id );
@@ -145,7 +148,7 @@ function insert_variations( \WP_REST_Request $request ) {
  * Receive variations updates
  *
  * @param \WP_REST_Request $request WP_REST_Request instance.
- * @return array
+ * @return array|bool
  */
 function receive_variations( \WP_REST_Request $request ) {
 	$post_id          = $request->get_param( 'post_id' );
@@ -156,6 +159,8 @@ function receive_variations( \WP_REST_Request $request ) {
 		return $is_valid_request;
 	}
 
+	$variation_data = \DT\NbAddon\WC\Utils\decode( $variation_data );
+
 	if ( \DT\NbAddon\WC\Utils\is_assoc( $variation_data ) ) {
 		\DT\NbAddon\WC\Utils\sync_variations( $post_id, $variation_data['current_variations'] );
 		$res = \DT\NbAddon\WC\Utils\set_variation_update( $variation_data, $post_id );
@@ -165,7 +170,7 @@ function receive_variations( \WP_REST_Request $request ) {
 	}
 		/**
 	 * Action triggered after variations update in spoke
-	 * 
+	 *
 	 * @param int $post_id Parent post ID.
 	 */
 	do_action('dt_variations_updated' ,$post_id);
@@ -177,7 +182,7 @@ function receive_variations( \WP_REST_Request $request ) {
  * Delete variation that was deleted in source
  *
  * @param \WP_REST_Request $request WP_REST_Request instance.
- * @return array
+ * @return array|\WP_Error|bool
  */
 function delete_variations( \WP_REST_Request $request ) {
 	$original_variation_id = $request->get_param( 'post_id' );
@@ -195,10 +200,8 @@ function delete_variations( \WP_REST_Request $request ) {
 	$variation->delete( true );
 	/**
 	 * Action triggered after variation deleted in spoke
-	 * 
+	 *
 	 * @param int $parent_id Parent post ID.
 	 */
 	do_action('dt_variation_deleted',$parent_id);
 }
-
-

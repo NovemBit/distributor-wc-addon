@@ -26,7 +26,7 @@ function prepare_bulk_variations_update( $variations ) {
  *
  * @param int $variation_id Updated variation id.
  *
- * @return array Prepared and formatted variation update array.
+ * @return false|string Prepared and formatted variation update array in json format.
  */
 function prepare_variation_update( $variation_id ) {
 	$variation = wc_get_product( $variation_id );
@@ -44,7 +44,7 @@ function prepare_variation_update( $variation_id ) {
 		__NAMESPACE__ . '\change_variation_blacklisted_meta'
 	);
 
-	return [
+	$data = [
 		'original_id'        => $variation->get_id(),
 		'data'               => [
 			'sku'               => $variation->get_sku(),
@@ -70,6 +70,29 @@ function prepare_variation_update( $variation_id ) {
 		'current_variations' => wc_get_product( $variation->get_parent_id() )->get_children(),
 		'meta'               => $meta,
 	];
+
+	return json_encode( $data );
+}
+
+/**
+ * Decode data received in json format
+ *
+ * @param $item
+ *
+ * @return array|mixed
+ */
+function decode($item) {
+	if( is_array( $item ) ) {
+		$res = [];
+
+		foreach( $item as $i ) {
+			$res[] = json_decode($i, true);
+		}
+
+		return $res;
+	}
+
+	return json_decode($item, true);
 }
 
 /**
