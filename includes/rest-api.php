@@ -155,6 +155,7 @@ function receive_variations( \WP_REST_Request $request ) {
 	$signature        = $request->get_param( 'signature' );
 	$variation_data   = $request->get_param( 'variation_data' );
 	$is_valid_request = \DT\NbAddon\WC\Utils\validate_request( $post_id, $signature );
+
 	if ( true !== $is_valid_request ) {
 		return $is_valid_request;
 	}
@@ -168,12 +169,12 @@ function receive_variations( \WP_REST_Request $request ) {
 		\DT\NbAddon\WC\Utils\sync_variations( $post_id, $variation_data[0]['current_variations'] );
 		$res = \DT\NbAddon\WC\Utils\set_variations_update( $variation_data, $post_id );
 	}
-		/**
+	/**
 	 * Action triggered after variations update in spoke
 	 *
 	 * @param int $post_id Parent post ID.
 	 */
-	do_action('dt_variations_updated' ,$post_id);
+	do_action( 'dt_variations_updated', $post_id, $request );
 	return $res;
 }
 
