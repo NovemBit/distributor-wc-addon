@@ -17,6 +17,7 @@ function setup() {
 			add_action( 'dt_post_subscription_created', __NAMESPACE__ . '\push_variations', 10, 4 );
 			add_action( 'delete_post', __NAMESPACE__ . '\on_variation_delete', 10, 1 );
 			add_action( 'woocommerce_update_product_variation', __NAMESPACE__ . '\variation_update', 10, 2 );
+			add_action( 'woocommerce_new_product_variation', __NAMESPACE__ . '\variation_update', 10, 2 );
 			add_action( 'updated_post_meta', __NAMESPACE__ . '\updated_post_meta', 10, 4 );
 		}
 	);
