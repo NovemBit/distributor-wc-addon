@@ -126,12 +126,30 @@ function change_variation_blacklisted_meta( $blacklist ) {
  *
  * @param array $variations Variations array to be updated
  * @param int   $post_id Parent post ID
+ *
+ * @return array
  */
 function set_variations_update( $variations, $post_id ) {
-	$result = [];
+	$result                         = [];
+	$result['variations_succeeded'] = [];
+	$result['variations_failed']    = [];
+
 	foreach ( $variations as $variation ) {
-		$result[] = set_variation_update( $variation, $post_id );
+		$status = set_variation_update( $variation, $post_id );
+
+		if ($status['updated']) {
+			$result['variations_succeeded'][] = $variation['original_id'];
+		} else {
+			$result['variations_failed'][] = $variation['original_id'];
+		}
 	}
+
+	if ( empty( $result['variations_failed'] ) ) {
+		$result['updated'] = true;
+	} else {
+		$result['updated'] = false;
+	}
+
 	return $result;
 }
 
@@ -182,7 +200,7 @@ function set_variation_update( $variation_data, $post_id, $variation_id = null )
 			]
 		);
 		return [
-			'status' => 'success',
+			'updated' => true,
 			'data'   => [
 				'variation_id'        => $original_id,
 				'variation_remote_id' => $variation_id,

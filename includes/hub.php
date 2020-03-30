@@ -143,6 +143,8 @@ function process_variation_update( $post_id, $var ) {
 		$remote_post_id = get_post_meta( $subscription_id, 'dt_subscription_remote_post_id', true );
 		$target_url     = get_post_meta( $subscription_id, 'dt_subscription_target_url', true );
 
+		$result[$subscription_key]['target_url'] = $target_url;
+
 		if ( empty( $signature ) || empty( $remote_post_id ) || empty( $target_url ) ) {
 			continue;
 		}
@@ -167,11 +169,12 @@ function process_variation_update( $post_id, $var ) {
 		);
 		if ( ! is_wp_error( $request ) ) {
 			$response_code = wp_remote_retrieve_response_code( $request );
-			$headers       = wp_remote_retrieve_headers( $request );
+			$body          = wp_remote_retrieve_body( $request );
 
-			$result[ $post_id ][ $subscription_id ] = json_decode( wp_remote_retrieve_body( $request ) );
+			$result[$subscription_key]['response']['code'] = $response_code;
+			$result[$subscription_key]['response']['body'] = $body;
 		} else {
-			$result[ $post_id ][ $subscription_id ] = $request;
+			$result[$subscription_key]['response'] = $request;
 		}
 	}
 	return $result;
