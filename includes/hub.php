@@ -18,7 +18,12 @@ function setup() {
 			add_action( 'delete_post', __NAMESPACE__ . '\on_variation_delete', 10, 1 );
 			add_action( 'woocommerce_update_product_variation', __NAMESPACE__ . '\variation_update', 10, 2 );
 			add_action( 'woocommerce_new_product_variation', __NAMESPACE__ . '\variation_update', 10, 2 );
+		}
+	);
 
+	add_action(
+		'rest_api_init',
+		function() {
 			$uri = $_SERVER['REQUEST_URI'];
 
 			if ( preg_match( '~/wp-json/wc/v2/products/(\d+)~', $uri, $matches ) ) {
