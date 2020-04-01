@@ -18,7 +18,14 @@ function setup() {
 			add_action( 'delete_post', __NAMESPACE__ . '\on_variation_delete', 10, 1 );
 			add_action( 'woocommerce_update_product_variation', __NAMESPACE__ . '\variation_update', 10, 2 );
 			add_action( 'woocommerce_new_product_variation', __NAMESPACE__ . '\variation_update', 10, 2 );
-			add_action( 'updated_post_meta', __NAMESPACE__ . '\updated_post_meta', 10, 4 );
+
+			$uri = $_SERVER['REQUEST_URI'];
+
+			if ( preg_match( '~/wp-json/wc/v2/products/(\d+)~', $uri, $matches ) ) {
+				add_action( 'updated_post_meta', __NAMESPACE__ . '\updated_post_meta', 10, 4 );
+				add_action( 'added_term_relationship', __NAMESPACE__ . '\updated_term_relationship', 10, 3 );
+				add_action( 'deleted_term_relationships', __NAMESPACE__ . '\updated_term_relationship', 10, 3 );
+			}
 		}
 	);
 }
@@ -242,7 +249,25 @@ function on_variation_delete( $post_id ) {
  * @return array|false|void|\WP_Error
  */
 function updated_post_meta( $meta_id, $post_id, $meta_key, $meta_value ) {
-	static $distributed_product_ids = array();
+	$blacklist_meta = [
+		'_advanced_pricing',
+		'_edit_lock',
+		'_price',
+		'_regular_price',
+		'uid_tc_last_update',
+	];
+
+	if( in_array( $meta_key, $blacklist_meta ) || strpos( $meta_key, 'algolia_' ) === 0 ) {
+		return;
+	}
+
+	$type = get_post_type( $post_id );
+
+	if ( $type != 'product' ) {
+		return;
+	}
+
+	static $distributed_product_ids = [];
 
 	if ( in_array( $post_id, $distributed_product_ids ) ) {
 		return;
@@ -252,5 +277,34 @@ function updated_post_meta( $meta_id, $post_id, $meta_key, $meta_value ) {
 
 	if ( function_exists( '\Distributor\Subscriptions\send_notifications' ) ) {
 		return \Distributor\Subscriptions\send_notifications( $post_id );
+	}
+}
+
+/**
+ * Trigger notification when term relationship updated
+ *
+ * @param int $object_id
+ * @param int $tt_id
+ * @param string $taxonomy
+ *
+ * @return array|false|void|\WP_Error
+ */
+function updated_term_relationship( int $object_id, int $tt_id, string $taxonomy ) {
+	$type = get_post_type( $object_id );
+
+	if ( $type != 'product' ) {
+		return;
+	}
+
+	static $distributed_product_ids = [];
+
+	if ( in_array( $object_id, $distributed_product_ids ) ) {
+		return;
+	}
+
+	$distributed_product_ids[] = $object_id;
+
+	if ( function_exists( '\Distributor\Subscriptions\send_notifications' ) ) {
+		return \Distributor\Subscriptions\send_notifications( $object_id );
 	}
 }
