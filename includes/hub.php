@@ -255,7 +255,7 @@ function on_variation_delete( $post_id ) {
  */
 function updated_post_meta( $meta_id, $post_id, $meta_key, $meta_value ) {
 	$blacklist_meta = ['_edit_lock'];
-	$blacklist_meta = apply_filters( 'dt_product_updated', $blacklist_meta );
+	$blacklist_meta = apply_filters( 'dt_product_updated/blacklist_meta', $blacklist_meta );
 
 	if( in_array( $meta_key, $blacklist_meta ) || strpos( $meta_key, 'algolia_' ) === 0 ) {
 		return;
