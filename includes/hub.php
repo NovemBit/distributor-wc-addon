@@ -254,13 +254,8 @@ function on_variation_delete( $post_id ) {
  * @return array|false|void|\WP_Error
  */
 function updated_post_meta( $meta_id, $post_id, $meta_key, $meta_value ) {
-	$blacklist_meta = [
-		'_advanced_pricing',
-		'_edit_lock',
-		'_price',
-		'_regular_price',
-		'uid_tc_last_update',
-	];
+	$blacklist_meta = ['_edit_lock'];
+	$blacklist_meta = apply_filters( 'dt_product_updated', $blacklist_meta );
 
 	if( in_array( $meta_key, $blacklist_meta ) || strpos( $meta_key, 'algolia_' ) === 0 ) {
 		return;
