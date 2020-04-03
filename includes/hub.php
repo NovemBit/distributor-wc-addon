@@ -47,7 +47,10 @@ function setup() {
  * @return array|void
  */
 function push_variations( $post_id, $remote_post_id, $signature, $target_url, $allow_in_bg = true ) {
-	$post = get_post( $post_id );
+	$post                           = get_post( $post_id );
+	$result                         = [];
+	$result[$post_id]['target_url'] = $target_url;
+
 	if ( 'product' === $post->post_type && function_exists( 'wc_get_product' ) ) {
 		$_product = wc_get_product( $post->ID );
 		if ( $_product && null !== $_product && ! is_wp_error( $_product ) ) {
@@ -66,10 +69,12 @@ function push_variations( $post_id, $remote_post_id, $signature, $target_url, $a
 						 * @param string $target_url Target url to push to.
 						 */
 						$allow_wc_variation_insert = apply_filters( 'dt_allow_wc_variations_insert', true, $post_id, $remote_post_id, $signature, $target_url );
+
 						if ( false === $allow_wc_variation_insert ) {
 							return;
 						}
 					}
+
 					$variation_data = \DT\NbAddon\WC\Utils\prepare_bulk_variations_update( $variations );
 					$post_body      = [
 						'post_id'        => $remote_post_id,
@@ -89,17 +94,22 @@ function push_variations( $post_id, $remote_post_id, $signature, $target_url, $a
 							'body'    => apply_filters( 'dt_wc_variations_push_args', $post_body, $post_id ),
 						]
 					);
+
 					if ( ! is_wp_error( $request ) ) {
 						$response_code = wp_remote_retrieve_response_code( $request );
+						$body          = wp_remote_retrieve_body( $request );
 
-						$result = json_decode( wp_remote_retrieve_body( $request ) );
+						$result[$post_id]['response']['code'] = $response_code;
+						$result[$post_id]['response']['body'] = $body;
 					} else {
-						$result = $request;
+						$result[$post_id]['response'] = $request;
 					}
 				}
 			}
 		}
 	}
+
+	return $result;
 }
 
 

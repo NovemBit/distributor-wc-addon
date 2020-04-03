@@ -128,12 +128,18 @@ function insert_variations( \WP_REST_Request $request ) {
 	}
 
 	$variation_data = \DT\NbAddon\WC\Utils\decode( $variation_data );
-	$res            = [];
+	$result         = [];
 	$product        = wc_get_product( $post_id );
 
 	foreach ( $variation_data as $variation ) {
 		$inserted_id = \DT\NbAddon\WC\Utils\create_variation( $variation, $product );
-		$res[]       = \DT\NbAddon\WC\Utils\set_variation_update( $variation, $post_id, $inserted_id );
+		$status      = \DT\NbAddon\WC\Utils\set_variation_update( $variation, $post_id, $inserted_id );
+
+		if ($status['updated']) {
+			$result['variations_succeeded'][] = $variation['original_id'];
+		} else {
+			$result['variations_failed'][] = $variation['original_id'];
+		}
 	}
 	/**
 	 * Action triggered after variations initial insert in spoke
@@ -141,7 +147,7 @@ function insert_variations( \WP_REST_Request $request ) {
 	 * @param int $post_id Parent post ID.
 	 */
 	do_action('dt_variations_inserted', $post_id);
-	return $res;
+	return $result;
 }
 
 /**
