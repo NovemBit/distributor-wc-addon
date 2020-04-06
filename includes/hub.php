@@ -28,8 +28,8 @@ function setup() {
 
 			if ( preg_match( '~/wp-json/wc/v2/products/(\d+)~', $uri, $matches ) ) {
 				add_action( 'updated_post_meta', __NAMESPACE__ . '\updated_post_meta', 10, 4 );
-				add_action( 'added_term_relationship', __NAMESPACE__ . '\updated_term_relationship', 10, 3 );
-				add_action( 'deleted_term_relationships', __NAMESPACE__ . '\updated_term_relationship', 10, 3 );
+				add_action( 'added_term_relationship', __NAMESPACE__ . '\added_term_relationship', 10, 3 );
+				add_action( 'deleted_term_relationships', __NAMESPACE__ . '\deleted_term_relationships', 10, 3 );
 			}
 		}
 	);
@@ -291,15 +291,28 @@ function updated_post_meta( $meta_id, $post_id, $meta_key, $meta_value ) {
 }
 
 /**
- * Trigger notification when term relationship updated
+ * Trigger notification when term relationship added
  *
  * @param int $object_id
  * @param int $tt_id
  * @param string $taxonomy
- *
- * @return array|false|void|\WP_Error
  */
-function updated_term_relationship( int $object_id, int $tt_id, string $taxonomy ) {
+function added_term_relationship( int $object_id, int $tt_id, string $taxonomy ) {
+	updated_term_relationships( $object_id );
+}
+
+/**
+ * Trigger notification when term relationship deleted
+ *
+ * @param int $object_id
+ * @param array $tt_ids
+ * @param string $taxonomy
+ */
+function deleted_term_relationships( int $object_id, array $tt_ids, string $taxonomy ) {
+	updated_term_relationships( $object_id );
+}
+
+function updated_term_relationships( int $object_id ) {
 	$type = get_post_type( $object_id );
 
 	if ( $type != 'product' ) {
