@@ -312,6 +312,11 @@ function deleted_term_relationships( int $object_id, array $tt_ids, string $taxo
 	updated_term_relationships( $object_id );
 }
 
+/**
+ * @param int $object_id
+ *
+ * @return array|void
+ */
 function updated_term_relationships( int $object_id ) {
 	$type = get_post_type( $object_id );
 
