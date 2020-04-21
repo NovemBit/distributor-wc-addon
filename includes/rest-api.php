@@ -141,14 +141,8 @@ function insert_variations( \WP_REST_Request $request ) {
 			$result['variations_failed'][] = $variation['original_id'];
 		}
 	}
-	/**
-	 * Action triggered after variations initial insert in spoke
-	 *
-	 * @param int $post_id Parent post ID.
-	 */
-	do_action( 'dt_variations_inserted', $post_id );
 
-	return apply_filters( 'dt_variations_after_actions', $result );
+	return apply_filters( 'dt_variations_inserted', $result, $post_id, $request );
 }
 
 /**
@@ -176,14 +170,8 @@ function receive_variations( \WP_REST_Request $request ) {
 		\DT\NbAddon\WC\Utils\sync_variations( $post_id, $variation_data[0]['current_variations'] );
 		$result = \DT\NbAddon\WC\Utils\set_variations_update( $variation_data, $post_id );
 	}
-	/**
-	 * Action triggered after variations update in spoke
-	 *
-	 * @param int $post_id Parent post ID.
-	 */
-	do_action( 'dt_variations_updated', $post_id, $request );
 
-	return apply_filters( 'dt_variations_after_actions', $result );
+	return apply_filters( 'dt_variations_updated', $result, $post_id, $request );
 }
 
 
