@@ -141,13 +141,8 @@ function insert_variations( \WP_REST_Request $request ) {
 			$result['variations_failed'][] = $variation['original_id'];
 		}
 	}
-	/**
-	 * Action triggered after variations initial insert in spoke
-	 *
-	 * @param int $post_id Parent post ID.
-	 */
-	do_action('dt_variations_inserted', $post_id);
-	return $result;
+
+	return apply_filters( 'dt_variations_inserted', $result, $post_id, $request );
 }
 
 /**
@@ -170,18 +165,13 @@ function receive_variations( \WP_REST_Request $request ) {
 
 	if ( \DT\NbAddon\WC\Utils\is_assoc( $variation_data ) ) {
 		\DT\NbAddon\WC\Utils\sync_variations( $post_id, $variation_data['current_variations'] );
-		$res = \DT\NbAddon\WC\Utils\set_variation_update( $variation_data, $post_id );
+		$result = \DT\NbAddon\WC\Utils\set_variation_update( $variation_data, $post_id );
 	} else {
 		\DT\NbAddon\WC\Utils\sync_variations( $post_id, $variation_data[0]['current_variations'] );
-		$res = \DT\NbAddon\WC\Utils\set_variations_update( $variation_data, $post_id );
+		$result = \DT\NbAddon\WC\Utils\set_variations_update( $variation_data, $post_id );
 	}
-	/**
-	 * Action triggered after variations update in spoke
-	 *
-	 * @param int $post_id Parent post ID.
-	 */
-	do_action( 'dt_variations_updated', $post_id, $request );
-	return $res;
+
+	return apply_filters( 'dt_variations_updated', $result, $post_id, $request );
 }
 
 
