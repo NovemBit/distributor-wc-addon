@@ -142,6 +142,13 @@ function insert_variations( \WP_REST_Request $request ) {
 		}
 	}
 
+	/**
+	 * Filters the result sent to hub after variations added on spoke.
+	 *
+	 * @param array $result The resulting array containing information about variations.
+	 * @param int $post_id Parent post ID.
+	 * @param \WP_REST_Request $request Request received from hub.
+	 */
 	return apply_filters( 'dt_variations_inserted', $result, $post_id, $request );
 }
 
@@ -171,6 +178,13 @@ function receive_variations( \WP_REST_Request $request ) {
 		$result = \DT\NbAddon\WC\Utils\set_variations_update( $variation_data, $post_id );
 	}
 
+	/**
+	 * Filters the result sent to hub after variations updated on spoke
+	 *
+	 * @param array $result The resulting array containing information about variations.
+	 * @param int $post_id Parent post ID.
+	 * @param \WP_REST_Request $request Request received from hub.
+	 */
 	return apply_filters( 'dt_variations_updated', $result, $post_id, $request );
 }
 
