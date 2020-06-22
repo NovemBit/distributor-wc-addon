@@ -156,10 +156,14 @@ function variation_update( $variation_id ) {
 function process_variation_update( $post_id, $var ) {
 	$update        = is_array( $var ) ? \DT\NbAddon\WC\Utils\prepare_bulk_variations_update( $var ) : \DT\NbAddon\WC\Utils\prepare_variation_update( $var );
 	$subscriptions = get_post_meta( $post_id, 'dt_subscriptions', true );
+	$result        = [];
+
 	if ( empty( $subscriptions ) ) {
-		return false;
+		$result['response'] = 'No subscriptions.';
+
+		return $result;
 	}
-	$result = [];
+
 	foreach ( $subscriptions as $subscription_key => $subscription_id ) {
 		$signature      = get_post_meta( $subscription_id, 'dt_subscription_signature', true );
 		$remote_post_id = get_post_meta( $subscription_id, 'dt_subscription_remote_post_id', true );
