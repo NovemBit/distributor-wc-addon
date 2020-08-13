@@ -154,6 +154,11 @@ function variation_update( $variation_id ) {
  * @return array
  */
 function process_variation_update( $post_id, $var ) {
+	remove_filter(
+		'woocommerce_product_variation_get_backorders',
+		array( \Brandlight_Feature_Temporary_Management_Campaign::class, 'preventBackorder' ),
+		(PHP_INT_MAX - 10)
+	);
 	$update        = is_array( $var ) ? \DT\NbAddon\WC\Utils\prepare_bulk_variations_update( $var ) : \DT\NbAddon\WC\Utils\prepare_variation_update( $var );
 	$subscriptions = get_post_meta( $post_id, 'dt_subscriptions', true );
 	$result        = [];
