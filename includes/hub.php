@@ -75,6 +75,10 @@ function push_variations( $post_id, $remote_post_id, $signature, $target_url, $a
 						}
 					}
 
+					/**
+					 * Action triggered before variations data is prepared.
+					 */
+					do_action( 'dt_before_variations_processing' );
 					$variation_data = \DT\NbAddon\WC\Utils\prepare_bulk_variations_update( $variations );
 					$post_body      = [
 						'post_id'        => $remote_post_id,
@@ -154,6 +158,10 @@ function variation_update( $variation_id ) {
  * @return array
  */
 function process_variation_update( $post_id, $var ) {
+	/**
+	 * Action triggered before variations data is prepared.
+	 */
+	do_action( 'dt_before_variations_processing' );
 	$update        = is_array( $var ) ? \DT\NbAddon\WC\Utils\prepare_bulk_variations_update( $var ) : \DT\NbAddon\WC\Utils\prepare_variation_update( $var );
 	$subscriptions = get_post_meta( $post_id, 'dt_subscriptions', true );
 	$result        = [];
