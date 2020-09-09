@@ -216,3 +216,22 @@ function delete_variations( \WP_REST_Request $request ) {
 	 */
 	do_action('dt_variation_deleted',$parent_id);
 }
+
+/**
+ * Trigger woocommerce update after post has been distributed.
+ *
+ * @param \WP_Post $post Post object.
+ * @param \WP_REST_Request $request Request object.
+ */
+function update_wc_product( $post, $request ) {
+	if ( $post->post_type !== 'product' ) {
+		return;
+	}
+
+	$product = wc_get_product( $post->ID );
+
+	if ( $product ) {
+		$product->save();
+	}
+}
+add_action( 'dt_process_subscription_attributes', 'update_wc_product', 10, 2 );
