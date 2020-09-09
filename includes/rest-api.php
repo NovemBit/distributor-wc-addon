@@ -15,6 +15,7 @@ function setup() {
 		'rest_api_init',
 		__NAMESPACE__ . '\register_rest_routes'
 	);
+	add_action( 'dt_process_subscription_attributes', __NAMESPACE__ . '\update_wc_product', 10, 2 );
 }
 
 /**
@@ -234,4 +235,3 @@ function update_wc_product( $post, $request ) {
 		$product->save();
 	}
 }
-add_action( 'dt_process_subscription_attributes', 'update_wc_product', 10, 2 );
